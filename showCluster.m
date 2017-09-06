@@ -11,7 +11,7 @@ cl = data((data(:, 4) == 0), :);
 plot(cl(:, 1), cl(:, 2), '.')
 hold on
 
-% 簇编号1的点画红色*
+% 画出已经成功聚类的点，颜色按照colotTable
 for i=1:length(colorTable)
     cl = data((data(:, 4) == i), :);
     plot(cl(:, 1), cl(:, 2), ['*', colorTable(i)])
@@ -26,10 +26,9 @@ for i=1:length(cl(:, 1))
 end
 hold on;
 
-% 边界点用红色圆圈标出eps范围
+% 边界点用对应颜色的圆圈标出eps范围
 cl = data((data(:, 5) == 2 ), :);
 for i=1:length(cl(:, 1))
-    % TODO： bug
     drawCircle(cl(i, 1), cl(i, 2), radius, char(colorTable(cl(i, 4))));
 end
 

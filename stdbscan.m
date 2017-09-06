@@ -27,9 +27,9 @@ for i=1:length(D(:, 1))                                             	%(i)
         else                                        % construct a new cluster(v)
             clusterLabel = clusterLabel + 1;
             clusterItem = [];       % 簇内数据项
+            D(i, 5) = 1;    % 数据类型设置为core object  
             for j=1:length(X)
                 D(X(j), 4) = clusterLabel;
-                D(X(j), 5) = 1;    % 数据类型设置为core object  
                 clusterItem = [clusterItem, D(X(j), 3)];    %为了计算这个簇的数据平均值，所以需要把这个簇中的所有数据都存下来。详见ST-DBSCAN文章3.3
                 showCluster(D, EPS1, clusterLabelColor);
             end
@@ -42,6 +42,7 @@ for i=1:length(D(:, 1))                                             	%(i)
                 Y = retrieveNeighbors(D, ptCurrent, EPS1, EPS2, clusterLabel);
                 
                 if length(Y) >= MINPTS
+                    D(ptCurrent, 5) = 1;    % 数据类型设置为core object  
                     for j=1:length(Y)                                       %(vii)
                         
                         % is not marked as noise
