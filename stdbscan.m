@@ -9,12 +9,13 @@ pt4 = genRandPointInCircle(0, 0, 6, NOISE_POINT_NUM, 2);
 D = [pt1; pt2; pt3; pt4];
 
 %% 输入参数 eps1 eps2 minpts Δε
-EPS1 = 0.8;
+EPS1 = 1;
 EPS2 = 1.2;
 MINPTS = 5;
 DELTA_E = 1.1;
 
 %% ST-DBSCAN开始
+clusterLabelColor = ['r', 'g', 'c', 'b'];
 clf;                % 清空所有figure
 clusterLabel = 0;   % 初始化簇标号
 for i=1:length(D(:, 1))                                             	%(i)
@@ -22,7 +23,7 @@ for i=1:length(D(:, 1))                                             	%(i)
         X = retrieveNeighbors(D, i, EPS1, EPS2, 0);                 	%(iii)
         if length(X) < MINPTS
             D(i, 4) = -1;                                               %(iv)
-            showCluster(D, EPS1);
+            showCluster(D, EPS1, clusterLabelColor);
         else                                        % construct a new cluster(v)
             clusterLabel = clusterLabel + 1;
             clusterItem = [];       % 簇内数据项
@@ -30,7 +31,7 @@ for i=1:length(D(:, 1))                                             	%(i)
                 D(X(j), 4) = clusterLabel;
                 D(X(j), 5) = 1;    % 数据类型设置为core object  
                 clusterItem = [clusterItem, D(X(j), 3)];    %为了计算这个簇的数据平均值，所以需要把这个簇中的所有数据都存下来。详见ST-DBSCAN文章3.3
-                showCluster(D, EPS1);
+                showCluster(D, EPS1, clusterLabelColor);
             end
             
             queue = X;                                                 %(vi)
@@ -64,7 +65,7 @@ for i=1:length(D(:, 1))                                             	%(i)
                             D(Y(j), 5) = 1;                     % 数据类型设置为 core object 
                             clusterItem = [clusterItem, D(Y(j), 3)];
                             queue = [queue, Y(j)] ;             % 队列操作 push
-                            showCluster(D, EPS1);
+                            showCluster(D, EPS1, clusterLabelColor);
                         end
 
                     end
@@ -72,7 +73,7 @@ for i=1:length(D(:, 1))                                             	%(i)
                     D(ptCurrent, 4) = clusterLabel;
                     D(ptCurrent, 5) = 2;    %数据类型设置为 border 
                     clusterItem = [clusterItem, D(ptCurrent, 3)];
-                    showCluster(D, EPS1);
+                    showCluster(D, EPS1, clusterLabelColor);
                 end
                 
             end
@@ -82,6 +83,6 @@ for i=1:length(D(:, 1))                                             	%(i)
     end
 end
 
-showCluster(D, EPS1);
+showCluster(D, EPS1, clusterLabelColor);
 
 
