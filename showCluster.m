@@ -21,19 +21,13 @@ end
 % 噪声点的点画黑色点，并用黑色圆圈标出eps范围
 cl = data((data(:, 4) == -1), :);
 plot(cl(:, 1), cl(:, 2), 'dk')
-for i=1:length(cl(:, 1))
-    drawCircle(cl(i, 1), cl(i, 2), radius, 'k');
-end
+% for i=1:length(cl(:, 1))
+%     drawCircle(cl(i, 1), cl(i, 2), radius, 'k');
+% end
 hold on;
-
-% 边界点用对应颜色的圆圈标出eps范围
-cl = data((data(:, 5) == 2 ), :);
-for i=1:length(cl(:, 1))
-    drawCircle(cl(i, 1), cl(i, 2), radius, char(colorTable(cl(i, 4))));
-end
 
 axis([-6, 6, -6, 6])
 grid on;    % 画出网格
-pause(0.001);
+% pause(0.001);
 end
 

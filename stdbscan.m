@@ -19,68 +19,40 @@ clusterLabelColor = ['r', 'g', 'c', 'b'];
 clf;                % 清空所有figure
 clusterLabel = 0;   % 初始化簇标号
 for i=1:length(D(:, 1))                                             	%(i)
-    if D(i, 4) == 0                                                     %(ii)
+    if D(i, 4) == 0    %该点没有被处理过（不是核心点和噪声）            %(ii)
         X = retrieveNeighbors(D, i, EPS1, EPS2, 0);                 	%(iii)
-        if length(X) < MINPTS
+        if length(X) < MINPTS  %是噪声，不是核心点
             D(i, 4) = -1;                                               %(iv)
-            showCluster(D, EPS1, clusterLabelColor);
+%             showCluster(D, EPS1, clusterLabelColor);
         else                                        % construct a new cluster(v)
             clusterLabel = clusterLabel + 1;
-            clusterItem = [];       % 簇内数据项
-            D(i, 5) = 1;    % 数据类型设置为core object  
-            for j=1:length(X)
-                D(X(j), 4) = clusterLabel;
-                clusterItem = [clusterItem, D(X(j), 3)];    %为了计算这个簇的数据平均值，所以需要把这个簇中的所有数据都存下来。详见ST-DBSCAN文章3.3
-                showCluster(D, EPS1, clusterLabelColor);
-            end
-            
-            queue = X;                                                 %(vi)
+            clusterItem = D(i, 3);       % 簇内点的属性值为当前核心点属性值
+            D(i ,4) = clusterLabel;     %给核心点标号
+            queue = i;        %将核心点加入队列                                         %(vi)
             
             while isempty(queue) == 0
                 ptCurrent = queue(1);  % 队列操作 pop
                 queue(1) = [];        
                 Y = retrieveNeighbors(D, ptCurrent, EPS1, EPS2, clusterLabel);
                 
-                if length(Y) >= MINPTS
-                    D(ptCurrent, 5) = 1;    % 数据类型设置为core object  
+                if length(Y) >= MINPTS   %队列中的当前点也是核心点
                     for j=1:length(Y)                                       %(vii)
-                        
-                        % is not marked as noise
-                        if D(Y(j), 4) == -1
-                            isNotNoise = 0;
-                        else
-                            isNotNoise = 1;
-                        end
-                        
-                        % is in not in a cluster
-                        if D(Y(j), 4) == 0
-                            isNotInCluster = 1;
-                        else
-                            isNotInCluster = 0;
-                        end
-                        
-                        % TODO：论文这里似乎有些啰嗦，感觉isNotNoist和isNotInCluster有点冗余
                         % |Cluter_Ave() - o.value| < e
-                        if (isNotNoise && isNotInCluster) && abs(mean(clusterItem) - D(Y(j), 3)) < DELTA_E
+                        %判断当前点的邻居是否加入队列（噪声/未处理的点+属性，邻居一定符合空间条件）
+                        if ((D(Y(j), 4) == -1) || (D(Y(j), 4) == 0)) && abs(mean(clusterItem) - D(Y(j), 3)) < DELTA_E
                             D(Y(j), 4) = clusterLabel;          % mark o with current cluster label
-                            D(Y(j), 5) = 1;                     % 数据类型设置为 core object 
                             clusterItem = [clusterItem, D(Y(j), 3)];
                             queue = [queue, Y(j)] ;             % 队列操作 push
-                            showCluster(D, EPS1, clusterLabelColor);
+%                             showCluster(D, EPS1, clusterLabelColor);
                         end
-
                     end
-                else % 以下几行和论文中有所不同，把不是core object的点作为边界一并加入簇中，但不再继续扩展
+                else % 队列中的点是边界点，以下几行和论文中有所不同，把不是core object的点作为边界一并加入簇中，但不再继续扩展
                     D(ptCurrent, 4) = clusterLabel;
-                    D(ptCurrent, 5) = 2;    %数据类型设置为 border 
                     clusterItem = [clusterItem, D(ptCurrent, 3)];
-                    showCluster(D, EPS1, clusterLabelColor);
+                    %showCluster(D, EPS1, clusterLabelColor);
                 end
-                
             end
-            
         end
-        
     end
 end
 
